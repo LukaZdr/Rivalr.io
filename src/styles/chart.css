@@ -1,0 +1,101 @@
+/* ============================================
+   Rivalr.io — Chart Component Styles
+   ============================================ */
+
+.chart-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 8/3; /* Adjust based on preference */
+  min-height: 250px;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-2);
+}
+
+.progress-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.chart-grid-line {
+  stroke: var(--color-border);
+  stroke-dasharray: 4 4;
+}
+
+.chart-axis-text {
+  fill: var(--color-text-tertiary);
+  font-size: 11px;
+  font-family: var(--font-family);
+}
+
+.chart-line {
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
+  transition: d 0.5s ease-in-out;
+}
+
+.chart-point {
+  transition: r 0.2s;
+}
+
+.chart-hover-target {
+  cursor: pointer;
+}
+
+.chart-hover-target:hover + .chart-end-label {
+   /* highlight label if needed */
+}
+
+.chart-tooltip {
+  position: absolute;
+  pointer-events: none;
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(8px);
+  z-index: 10;
+  transition: opacity 0.2s ease, transform 0.1s ease;
+  min-width: 120px;
+  text-align: center;
+}
+
+.chart-legend-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.chart-legend-pill:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text-primary);
+}
+
+.chart-legend-pill.inactive {
+  opacity: 0.4;
+  filter: grayscale(1);
+}
+
+.legend-color {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* Make it responsive */
+@media (max-width: 768px) {
+  .chart-wrapper {
+    aspect-ratio: 16/9;
+  }
+}

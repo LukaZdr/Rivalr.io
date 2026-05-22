@@ -1,0 +1,232 @@
+/* ============================================
+   Rivalr.io — Feed Styles
+   ============================================ */
+
+.feed-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+/* Feed Composer */
+.feed-composer {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  box-shadow: var(--shadow-sm);
+}
+
+.composer-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--color-text-primary);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  resize: none;
+  min-height: 60px;
+  outline: none;
+}
+
+.composer-input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.composer-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-3);
+}
+
+.composer-image-preview {
+  position: relative;
+  display: inline-block;
+  margin-top: var(--space-2);
+}
+
+.composer-image-preview img {
+  max-height: 200px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+}
+
+.composer-remove-image {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.composer-remove-image:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+/* Feed Item */
+.feed-item {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  border: var(--glass-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  transition: all var(--transition-fast);
+}
+
+.feed-item:hover {
+  border-color: var(--color-border-hover);
+}
+
+.feed-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.feed-user-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.feed-user-name {
+  font-weight: 700;
+  font-size: var(--font-size-md);
+  color: var(--color-text-primary);
+}
+
+.feed-time {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}
+
+.feed-content {
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.feed-image {
+  margin-top: var(--space-2);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  max-height: 400px;
+  width: auto;
+  object-fit: cover;
+}
+
+.feed-log-box {
+  background: var(--color-surface);
+  border-left: 3px solid var(--color-accent);
+  padding: var(--space-3);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  margin-top: var(--space-2);
+}
+
+.feed-log-title {
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--space-1);
+}
+
+.feed-log-note {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+/* Interactions */
+.feed-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.feed-action-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.feed-action-btn:hover {
+  color: var(--color-text-primary);
+}
+
+.feed-action-btn.liked {
+  color: var(--color-error); /* Heart red */
+}
+
+/* Comments */
+.feed-comments {
+  margin-top: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.feed-comment {
+  display: flex;
+  gap: var(--space-3);
+  background: var(--color-surface);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+}
+
+.feed-comment-content {
+  flex: 1;
+}
+
+.feed-comment-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+
+.feed-comment-name {
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+}
+
+.feed-comment-text {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.comment-input-wrap {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.comment-input-wrap .input {
+  flex: 1;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-size-sm);
+}
