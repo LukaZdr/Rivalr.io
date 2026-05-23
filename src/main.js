@@ -22,6 +22,11 @@ route('/dashboard', async () => {
   return await renderDashboard();
 });
 
+import { renderAdmin } from './pages/admin.js';
+route('/admin', async () => {
+  return await renderAdmin();
+});
+
 // Auth guard
 setAuthGuard(async () => {
   try {
@@ -32,6 +37,7 @@ setAuthGuard(async () => {
     return {
       authenticated: true,
       hasProfile: !!profile,
+      isAdmin: profile?.is_admin || false,
     };
   } catch {
     return { authenticated: false, hasProfile: false };

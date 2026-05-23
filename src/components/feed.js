@@ -179,7 +179,7 @@ export function renderFeed(container, feedData, currentUser, onRefresh) {
             <div class="feed-time">${timeAgo(item.createdAt)}</div>
           </div>
         </div>
-        ${item.userId === currentUser.id && item.itemType === 'post' ? `
+        ${(item.userId === currentUser.id || currentUser.is_admin) && item.itemType === 'post' ? `
           <button class="btn btn-ghost btn-sm btn-delete-post" data-id="${item.id}" title="Delete Post">🗑️</button>
         ` : ''}
       </div>
@@ -214,9 +214,12 @@ export function renderFeed(container, feedData, currentUser, onRefresh) {
             <div class="feed-comment">
               <img src="${c.profiles?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(c.profiles?.username || 'U')}&background=6366f1&color=fff`}" class="avatar avatar-sm" style="width: 24px; height: 24px;" alt="Avatar" />
               <div class="feed-comment-content">
-                <div class="feed-comment-header">
+                <div class="feed-comment-header flex items-center w-full">
                   <span class="feed-comment-name">${escapeHtml(c.profiles?.display_name || c.profiles?.username)}</span>
-                  <span class="text-xs text-tertiary">${timeAgo(new Date(c.created_at))}</span>
+                  <span class="text-xs text-tertiary ml-2">${timeAgo(new Date(c.created_at))}</span>
+                  ${c.user_id === currentUser.id || currentUser.is_admin ? `
+                    <button class="btn btn-ghost btn-xs btn-delete-comment ml-auto" data-id="${c.id}" title="Delete Comment">🗑️</button>
+                  ` : ''}
                 </div>
                 <div class="feed-comment-text">${escapeHtml(c.content)}</div>
               </div>
@@ -243,6 +246,20 @@ export function renderFeed(container, feedData, currentUser, onRefresh) {
         }
       });
     }
+
+    // Delete comments
+    const deleteCommentBtns = card.querySelectorAll('.btn-delete-comment');
+    deleteCommentBtns.forEach(btn => {
+      btn.addEventListener('click', async () => {
+        if (!confirm('Are you sure you want to delete this comment?')) return;
+        try {
+          await supabase.from('feed_comments').delete().eq('id', btn.dataset.id);
+          onRefresh();
+        } catch (e) {
+          showToast('Failed to delete comment', 'error');
+        }
+      });
+    });
 
     // Extend goal
     const extendBtn = card.querySelector('.btn-extend-goal');

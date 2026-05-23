@@ -120,11 +120,35 @@ export async function getMyGoals() {
 }
 
 /**
+ * Get all goals for a specific user (Admin use).
+ */
+export async function getUserGoals(userId) {
+  const { data, error } = await supabase
+    .from('goals')
+    .select('*, goal_logs(id, value, note, logged_at, is_milestone, milestone_target)')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return data || [];
+}
+
+/**
  * Create a new goal.
  */
 export async function createGoal(goalType, target, unit, goalKind = 'cumulative') {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
+
+  const { data: activeGoals, error: countError } = await supabase
+    .from('goals')
+    .select('id')
+    .eq('user_id', user.id)
+    .eq('is_archived', false);
+  if (countError) throw countError;
+  if (activeGoals && activeGoals.length >= 5) {
+    throw new Error('limitReached');
+  }
 
   const { data, error } = await supabase
     .from('goals')
@@ -135,6 +159,7 @@ export async function createGoal(goalType, target, unit, goalKind = 'cumulative'
       current: 0,
       unit: unit.trim(),
       goal_kind: goalKind,
+      is_archived: false,
     })
     .select()
     .single();
@@ -341,6 +366,41 @@ export async function deleteGoal(goalId) {
 }
 
 /**
+ * Archive a goal.
+ */
+export async function archiveGoal(goalId) {
+  const { error } = await supabase
+    .from('goals')
+    .update({ is_archived: true, updated_at: new Date().toISOString() })
+    .eq('id', goalId);
+  if (error) throw error;
+}
+
+/**
+ * Unarchive a goal.
+ */
+export async function unarchiveGoal(goalId) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const { data: activeGoals, error: countError } = await supabase
+    .from('goals')
+    .select('id')
+    .eq('user_id', user.id)
+    .eq('is_archived', false);
+  if (countError) throw countError;
+  if (activeGoals && activeGoals.length >= 5) {
+    throw new Error('limitReached');
+  }
+
+  const { error } = await supabase
+    .from('goals')
+    .update({ is_archived: false, updated_at: new Date().toISOString() })
+    .eq('id', goalId);
+  if (error) throw error;
+}
+
+/**
  * Get friends' goals for the leaderboard, including logs.
  */
 export async function getLeaderboardData() {
@@ -383,6 +443,7 @@ export async function getLeaderboardData() {
         milestone_target
       )
     `)
+    .eq('is_archived', false)
     .in('user_id', allIds)
     .order('updated_at', { ascending: false });
 
@@ -795,4 +856,17 @@ export async function removeFriend(friendId) {
 
   if (e1) throw e1;
   if (e2) throw e2;
+}
+
+// =============================
+// ADMIN API
+// =============================
+
+/**
+ * Fetch aggregated data for the Admin Dashboard.
+ */
+export async function fetchAdminData() {
+  const { data, error } = await supabase.rpc('get_admin_dashboard_data');
+  if (error) throw error;
+  return data;
 }

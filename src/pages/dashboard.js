@@ -223,6 +223,23 @@ export async function renderDashboard() {
         getLeaderboardData(),
         getFeedData()
       ]);
+
+      const activeGoals = goals.filter(g => !g.is_archived);
+      const btnAddGoal = document.getElementById('btn-add-goal');
+      if (btnAddGoal) {
+        if (activeGoals.length >= 5) {
+          btnAddGoal.disabled = true;
+          btnAddGoal.title = window.t ? window.t('goal.limitReached') : 'You can only have up to 5 active goals.';
+          btnAddGoal.style.opacity = '0.5';
+          btnAddGoal.style.cursor = 'not-allowed';
+        } else {
+          btnAddGoal.disabled = false;
+          btnAddGoal.title = '';
+          btnAddGoal.style.opacity = '1';
+          btnAddGoal.style.cursor = 'pointer';
+        }
+      }
+
       renderGoalCards(goalsContainer, goals, refreshAll);
       renderLeaderboard(leaderboardContainer, lbData, user.id);
       renderProgressChart(chartContainer, lbData, user.id);

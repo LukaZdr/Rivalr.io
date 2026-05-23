@@ -81,6 +81,11 @@ async function resolveRoute() {
       navigate('/dashboard');
       return;
     }
+
+    if (guard.authenticated && guard.hasProfile && !guard.isAdmin && path === '/admin') {
+      navigate('/dashboard');
+      return;
+    }
   }
 
   const handler = routes[path];

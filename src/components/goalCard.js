@@ -1,5 +1,5 @@
 import { showToast } from './toast.js';
-import { createGoal, logProgress, deleteGoal, updateGoalTarget, updateGoalLog, deleteGoalLog } from '../lib/api.js';
+import { createGoal, logProgress, deleteGoal, updateGoalTarget, updateGoalLog, deleteGoalLog, archiveGoal, unarchiveGoal } from '../lib/api.js';
 import { t } from '../lib/i18n.js';
 
 /**
@@ -11,7 +11,10 @@ import { t } from '../lib/i18n.js';
 export function renderGoalCards(container, goals, onRefresh) {
   container.innerHTML = '';
 
-  if (goals.length === 0) {
+  const activeGoals = goals.filter(g => !g.is_archived);
+  const archivedGoals = goals.filter(g => g.is_archived);
+
+  if (activeGoals.length === 0 && archivedGoals.length === 0) {
     container.innerHTML = `
       <div class="empty-state">
         <div class="empty-state-icon">🎯</div>
@@ -22,7 +25,7 @@ export function renderGoalCards(container, goals, onRefresh) {
     return;
   }
 
-  goals.forEach((goal, i) => {
+  const buildCard = (goal, i) => {
     const progress = Math.min(goal.current / goal.target, 1);
     const percent = Math.round(progress * 100);
     const isComplete = percent >= 100;
@@ -46,8 +49,12 @@ export function renderGoalCards(container, goals, onRefresh) {
           <button class="btn btn-ghost btn-sm btn-extend-goal-card text-xs text-primary" data-goal-id="${goal.id}" data-current-target="${goal.target}" title="${t('goal.extend')}">
             ${t('goal.extend')}
           </button>` : ''}
+          ${!goal.is_archived ? `
           <button class="btn btn-ghost btn-sm btn-edit-goal" data-goal-id="${goal.id}" title="Log progress">
             ➕
+          </button>` : ''}
+          <button class="btn btn-ghost btn-sm btn-archive-goal" data-goal-id="${goal.id}" data-is-archived="${goal.is_archived}" title="${goal.is_archived ? t('goal.unarchive') : t('goal.archive')}">
+            📦
           </button>
           <button class="btn btn-ghost btn-sm btn-delete-goal" data-goal-id="${goal.id}" title="Delete goal">
             🗑️
@@ -121,8 +128,39 @@ export function renderGoalCards(container, goals, onRefresh) {
       </div>
     `;
 
-    container.appendChild(card);
+    return card;
+  };
+
+  activeGoals.forEach((goal, i) => {
+    container.appendChild(buildCard(goal, i));
   });
+
+  if (archivedGoals.length > 0) {
+    const toggleBtn = document.createElement('button');
+    toggleBtn.className = 'btn btn-ghost btn-sm w-full mt-6 text-tertiary';
+    toggleBtn.innerHTML = `${t('goal.showArchived')} ▼`;
+    container.appendChild(toggleBtn);
+
+    const archivedContainer = document.createElement('div');
+    archivedContainer.className = 'archived-goals-container hidden mt-4 flex flex-col gap-4';
+    archivedContainer.style.opacity = '0.7';
+
+    archivedGoals.forEach((goal, i) => {
+      archivedContainer.appendChild(buildCard(goal, i));
+    });
+
+    container.appendChild(archivedContainer);
+
+    toggleBtn.addEventListener('click', () => {
+      if (archivedContainer.classList.contains('hidden')) {
+        archivedContainer.classList.remove('hidden');
+        toggleBtn.innerHTML = `${t('goal.hideArchived')} ▲`;
+      } else {
+        archivedContainer.classList.add('hidden');
+        toggleBtn.innerHTML = `${t('goal.showArchived')} ▼`;
+      }
+    });
+  }
 
   // Edit goal handlers
   container.querySelectorAll('.btn-edit-goal').forEach(btn => {
@@ -153,6 +191,30 @@ export function renderGoalCards(container, goals, onRefresh) {
         onRefresh();
       } catch (err) {
         showToast(t('goal.deleteError'), 'error');
+      }
+    });
+  });
+
+  // Archive goal handlers
+  container.querySelectorAll('.btn-archive-goal').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const goalId = btn.dataset.goalId;
+      const isArchived = btn.dataset.isArchived === 'true';
+      try {
+        if (isArchived) {
+          await unarchiveGoal(goalId);
+          showToast(t('goal.unarchived'), 'success');
+        } else {
+          await archiveGoal(goalId);
+          showToast(t('goal.archived'), 'success');
+        }
+        onRefresh();
+      } catch (err) {
+        if (err.message === 'limitReached') {
+          showToast(window.t ? window.t('goal.limitReached') : 'You can only have up to 5 active goals.', 'error');
+        } else {
+          showToast('Failed to update goal', 'error');
+        }
       }
     });
   });
@@ -349,6 +411,12 @@ export function showCreateGoalModal(onRefresh) {
     { type: 'Swimming', unit: 'laps', icon: '🏊' },
     { type: 'Cycling', unit: 'km', icon: '🚴' },
   ];
+  const presetsHtml = presets.map(p => `
+    <button type="button" class="goal-preset btn btn-ghost flex flex-col items-center justify-center p-2" data-type="${p.type}" data-unit="${p.unit}">
+      <span class="text-xl">${p.icon}</span>
+      <span class="text-xs mt-1 text-center" style="white-space: nowrap;">${p.type}</span>
+    </button>
+  `).join('');
 
   overlay.innerHTML = `
     <div class="modal">
@@ -356,7 +424,7 @@ export function showCreateGoalModal(onRefresh) {
         <h2>New Goal</h2>
         <button class="modal-close" id="close-create-modal">✕</button>
       </div>
-      <div class="goal-presets">
+      <div class="goal-presets gap-2" style="display: grid; grid-template-columns: repeat(3, 1fr);">
         ${presetsHtml}
       </div>
       <form id="create-goal-form" class="flex flex-col gap-4 mt-4">

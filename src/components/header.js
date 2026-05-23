@@ -29,7 +29,8 @@ export function renderHeader(profile, pendingCount = 0, onEditProfile = null) {
         <span class="header-name">Rivalr<span class="text-gradient">.io</span></span>
       </a>
 
-      <div class="header-right">
+      <div class="header-right flex items-center gap-4">
+        ${profile.is_admin ? `<a href="#/admin" class="btn btn-ghost btn-sm text-xs text-primary" title="Admin Dashboard">👑 Admin</a>` : ''}
         ${badgeHtml ? `<div class="header-notifications">${badgeHtml}</div>` : ''}
         <div class="header-user cursor-pointer transition hover:opacity-80" id="btn-edit-profile" title="${t('header.editProfile')}">
           ${avatarHtml}

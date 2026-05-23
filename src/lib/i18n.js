@@ -68,6 +68,13 @@ const dictionary = {
     "goal.history.show": "Show History",
     "goal.history.hide": "Hide History",
     "goal.history.empty": "No logs yet.",
+    "goal.archive": "Archive Goal",
+    "goal.unarchive": "Unarchive Goal",
+    "goal.archived": "Goal archived",
+    "goal.unarchived": "Goal unarchived",
+    "goal.showArchived": "Show Archived Goals",
+    "goal.hideArchived": "Hide Archived Goals",
+    "goal.limitReached": "You can only have up to 5 active goals. Archive or delete one first.",
 
     // Log Progress Modal
     "log.title": "Log Progress",
@@ -223,6 +230,13 @@ const dictionary = {
     "goal.history.show": "Verlauf anzeigen",
     "goal.history.hide": "Verlauf ausblenden",
     "goal.history.empty": "Noch keine Einträge.",
+    "goal.archive": "Ziel archivieren",
+    "goal.unarchive": "Ziel wiederherstellen",
+    "goal.archived": "Ziel archiviert",
+    "goal.unarchived": "Ziel wiederhergestellt",
+    "goal.showArchived": "Archivierte Ziele anzeigen",
+    "goal.hideArchived": "Archivierte Ziele ausblenden",
+    "goal.limitReached": "Du kannst maximal 5 aktive Ziele haben. Archiviere oder lösche zuerst eines.",
 
     // Log Progress Modal
     "log.title": "Fortschritt eintragen",
