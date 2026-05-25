@@ -26,7 +26,10 @@ export function renderGoalCards(container, goals, onRefresh) {
   }
 
   const buildCard = (goal, i) => {
-    const progress = Math.min(goal.current / goal.target, 1);
+    const start = goal.start_value || 0;
+    const targetDiff = goal.target - start;
+    const currentDiff = goal.current - start;
+    const progress = targetDiff > 0 ? Math.min(Math.max(currentDiff / targetDiff, 0), 1) : (goal.current >= goal.target ? 1 : 0);
     const percent = Math.round(progress * 100);
     const isComplete = percent >= 100;
     const kindLabel = goal.goal_kind === 'milestone' ? t('goal.milestone') : t('goal.cumulative');

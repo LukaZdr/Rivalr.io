@@ -51,11 +51,16 @@ export function renderProgressChart(container, leaderboardData, currentUserId) {
        
        sortedLogs.forEach(log => {
           let currentProgress = 0;
+          const start = goal.start_value || 0;
+          const targetDiff = goal.target - start;
+
           if (goal.goal_kind === 'cumulative') {
              runningTotal += log.value;
-             currentProgress = Math.min((runningTotal / goal.target) * 100, 100);
+             const currentDiff = runningTotal - start;
+             currentProgress = targetDiff > 0 ? Math.min(Math.max((currentDiff / targetDiff) * 100, 0), 100) : (runningTotal >= goal.target ? 100 : 0);
           } else {
-             currentProgress = Math.min((log.value / goal.target) * 100, 100);
+             const currentDiff = log.value - start;
+             currentProgress = targetDiff > 0 ? Math.min(Math.max((currentDiff / targetDiff) * 100, 0), 100) : (log.value >= goal.target ? 100 : 0);
           }
           
           user.logs.push({

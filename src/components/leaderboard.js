@@ -20,7 +20,10 @@ export function renderLeaderboard(container, leaderboardData, currentUserId) {
       });
     }
     const entry = userMap.get(uid);
-    const progress = Math.min(goal.current / goal.target, 1);
+    const start = goal.start_value || 0;
+    const targetDiff = goal.target - start;
+    const currentDiff = goal.current - start;
+    const progress = targetDiff > 0 ? Math.min(Math.max(currentDiff / targetDiff, 0), 1) : (goal.current >= goal.target ? 1 : 0);
     entry.goals.push({ ...goal, progress });
     entry.totalProgress += progress;
     entry.totalGoals += 1;

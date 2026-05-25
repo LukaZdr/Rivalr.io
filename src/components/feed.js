@@ -84,7 +84,7 @@ export function renderFeed(container, feedData, currentUser, onRefresh) {
     btnPost.textContent = t('feed.posting');
 
     try {
-      await createFeedPost(text, selectedFile);
+      await createFeedPost(content, selectedFile);
       showToast('Posted to feed', 'success');
       textArea.value = '';
       selectedFile = null;

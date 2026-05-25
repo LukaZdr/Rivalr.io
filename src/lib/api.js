@@ -156,6 +156,7 @@ export async function createGoal(goalType, target, unit, goalKind = 'cumulative'
       user_id: user.id,
       goal_type: goalType.trim(),
       target: parseFloat(target),
+      start_value: 0,
       current: 0,
       unit: unit.trim(),
       goal_kind: goalKind,
@@ -209,6 +210,13 @@ export async function updateGoalTarget(goalId, newTarget) {
     .single();
 
   if (error) throw error;
+
+  try {
+    await createFeedPost(`I just extended my '${data.goal_type}' goal! New target: ${data.target} ${data.unit} 📈`);
+  } catch (e) {
+    console.error('Failed to post target extension to feed:', e);
+  }
+
   return data;
 }
 
@@ -252,20 +260,31 @@ export async function logProgress(goal, value, note = '', loggedAt = null) {
     logData.milestone_target = target;
   }
 
+  // Check if this is the very first log for this goal
+  const { count } = await supabase.from('goal_logs').select('id', { count: 'exact', head: true }).eq('goal_id', goal.id);
+  const isFirstLog = count === 0;
+
   const { error: logError } = await supabase
     .from('goal_logs')
     .insert(logData);
 
   if (logError) throw logError;
 
-  // 3. Update the goal's current value
+  // 3. Update the goal's current value (and start_value if first log)
+  
+  const updateData = {
+    current: newCurrent,
+    updated_at: new Date().toISOString()
+  };
+
+  // If milestone and first log, lock in the start value
+  if (isFirstLog && goal.goal_kind === 'milestone') {
+    updateData.start_value = numValue;
+  }
 
   const { data, error: updateError } = await supabase
     .from('goals')
-    .update({
-      current: newCurrent,
-      updated_at: new Date().toISOString()
-    })
+    .update(updateData)
     .eq('id', goal.id)
     .select()
     .single();
